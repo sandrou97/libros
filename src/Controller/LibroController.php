@@ -6,13 +6,63 @@
     use Symfony\Component\Routing\Annotation\Route;
     use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
     use App\Service\BDPruebaLibros;
+    use App\Entity\Libro;
+    use App\Entity\Editorial;
     
     class LibroController extends AbstractController
     {
+        
+        public function pedir(){
+            $libro_rep = $this->getDoctrine()->getRepository(Libro::class); 
+            $libros = $libro_rep->findAll();
+            return $libros;
+        }
 
-        private $libros;
-        public function __construct($bdPrueba) {
-           $this->libros = $bdPrueba->get();
+        /**
+         * @Route("/libro/insertar", name="insertar")
+         */
+        public function insertar(){
+            $entityManager = $this->getDoctrine()->getManager();
+            $libros = array(
+                array("isbn" => "A001", "titulo" => "Jarry Choped", "autor" => "JK Bowling", "paginas" => 100),
+                array("isbn" => "A002", "titulo" => "El señor de los palillos", "autor" => "JRR TolQuien", "paginas" => 200), 
+                array("isbn" => "A003", "titulo" => "Los polares de la tierra", "autor" => "Ken Follonett", "paginas" => 300), 
+                array("isbn" => "A004", "titulo" => "Los juegos de enjambre", "autor" => "Suzanne Collonins", "paginas" => 400),
+                );
+            foreach ($libros as $lib){
+                $libro = new Libro();
+                $libro->setIsbn($lib["isbn"]);
+                $libro->setTitulo($lib["titulo"]);
+                $libro->setAutor($lib["autor"]);
+                $libro->setPaginas($lib["paginas"]);
+                $entityManager->persist($libro);
+            }
+            $entityManager->flush();
+            return $this->redirectToRoute('libros');
+        }
+
+        /**
+         * @Route("/eliminar/{isbn}", name="eliminar")
+         */
+        public function eliminar($isbn){
+            $entityManager = $this->getDoctrine()->getManager();
+            $libro_rep = $this->getDoctrine()->getRepository(Libro::class); 
+            $libro = $libro_rep->find($isbn);
+            if ($libro)
+            {
+                $entityManager->remove($libro); 
+                $entityManager->flush();
+            }
+            return $this->redirectToRoute('libros');
+        }
+
+        /**
+         * @Route("/libros/paginas/{paginas}", name="paginas")
+         */
+        public function filtrarPaginas($paginas){
+                $repositorio = $this->getDoctrine()->getRepository(Libro::class);
+                $libros = $repositorio->nPaginas($paginas);
+                return $this->render('lista_libros_paginas.html.twig', array('libros' => $libros));
         }
 
         /**
@@ -20,10 +70,10 @@
          */
         public function ficha($isbn)
         {
-            $libro = NULL;
-                foreach($this->libros as $lib)
+            $libros = $this->pedir();
+                foreach($libros as $lib)
                 {
-                    if($lib["isbn"]==$isbn)
+                    if($lib->getIsbn()==$isbn)
                     {
                         $libro=$lib;
                     }
@@ -36,7 +86,26 @@
          */
         public function libros()
         {
-            return $this->render('lista_libros.html.twig', array('libros' => $this->libros));
+            return $this->render('lista_libros.html.twig', array('libros' => $this->pedir()));
+        }
+
+        /**
+         * @Route("/contacto/insertarConEditorial", name="paginas")
+         */
+        public function insertarConEditorial(){
+            $entityManager = $this->getDoctrine()->getManager();
+            $editorial = new Editorial();
+            $editorial->setNombre("Alfaomega");
+            $libro = new Libro();
+            $libro->setIsbn("2222BBBB");
+            $libro->setTitulo("Libro de prueba con editorial");
+            $libro->setAutor("Autor de prueba con editorial");
+            $libro->setPaginas(200);
+            $libro->setEditorial($editorial);
+            $entityManager->persist($libro);
+            $entityManager->persist($editorial);
+            $entityManager->flush();
+            return $this->redirectToRoute('libros');
         }
     }
 
