@@ -8,7 +8,6 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\LibroRepository")
- * @ORM\Entity
  * @UniqueEntity("isbn")
  */
 class Libro

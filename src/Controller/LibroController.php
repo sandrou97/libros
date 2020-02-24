@@ -36,6 +36,7 @@
          * @Route("/libro/insertar", name="insertar")
          */
         public function insertar(){
+            $this->denyAccessUnlessGranted('ROLE_ADMIN', null, 'Acceso restringido a administradores');
             $entityManager = $this->getDoctrine()->getManager();
             $libros = array(
                 array("isbn" => "A001", "titulo" => "Jarry Choped", "autor" => "JK Bowling", "paginas" => 100),
@@ -59,6 +60,7 @@
          * @Route("/nuevo", name="nuevo")
          */
         public function nuevo_libro(Request $request){
+            $this->denyAccessUnlessGranted('ROLE_ADMIN', null, 'Acceso restringido a administradores');
             $libro = new Libro();
             $formulario = $this->createFormBuilder($libro)
                 ->add('isbn', TextType::class)
@@ -103,6 +105,7 @@
          * @Route("/libro/editar/{isbn}", name="editar")
          */
         public function editar_libro(Request $request, $isbn){
+            $this->denyAccessUnlessGranted('ROLE_ADMIN', null, 'Acceso restringido a administradores');
             $libro_rep = $this->getDoctrine()->getRepository(Libro::class); 
             $libro = $libro_rep->find($isbn);
             $formulario = $this->createFormBuilder($libro)
@@ -131,6 +134,7 @@
          * @Route("/eliminar/{isbn}", name="eliminar")
          */
         public function eliminar($isbn){
+            $this->denyAccessUnlessGranted('ROLE_ADMIN', null, 'Acceso restringido a administradores');
             $entityManager = $this->getDoctrine()->getManager();
             $libro_rep = $this->getDoctrine()->getRepository(Libro::class); 
             $libro = $libro_rep->find($isbn);
@@ -143,7 +147,7 @@
         }
 
         /**
-         * @Route("/libros/paginas/{paginas}", name="paginas")
+         * @Route("/libro/paginas/{paginas}", name="paginas")
          */
         public function filtrarPaginas($paginas){
                 $repositorio = $this->getDoctrine()->getRepository(Libro::class);
@@ -179,6 +183,7 @@
          * @Route("/contacto/insertarConEditorial", name="paginas")
          */
         public function insertarConEditorial(){
+            $this->denyAccessUnlessGranted('ROLE_ADMIN', null, 'Acceso restringido a administradores');
             $entityManager = $this->getDoctrine()->getManager();
             $editorial = new Editorial();
             $editorial->setNombre("Alfaomega");

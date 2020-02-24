@@ -4,7 +4,7 @@
     <h2> Listado de libros </h2>
     {% for libro in libros %}
     <ul>
-    <li><a href="{{ path('ficha_libro',{'isbn':libro.isbn}) }}">{{ libro.titulo }}</a> <a href="{{ path('eliminar',{'isbn':libro.isbn}) }}">eliminar</a></li>
+    <li><a href="{{ path('ficha_libro',{'isbn':libro.isbn}) }}">{{ libro.titulo }}</a> {% if is_granted('ROLE_ADMIN') %} <a href="{{ path('editar',{'isbn':libro.isbn}) }}">editar</a> <a href="{{ path('eliminar',{'isbn':libro.isbn}) }}">eliminar</a></li>{% endif %}
     </ul>
     {% endfor %}
 

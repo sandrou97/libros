@@ -1,3 +1,6 @@
 libros:
     path: /libro
     controller: App\Controller\LibroController::libros
+
+logout:
+    path: /logout

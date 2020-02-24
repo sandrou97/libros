@@ -10,9 +10,13 @@
         <nav> 
 			<ul> 
 				<li><a href="{{ path('inicio') }}">inicio</a></li> 
-				<li><a href="{{ path('libros') }}">ver libros</a></li>		
-				<li><a href="{{ path('nuevo') }}">nuevo libro</a></li>			
-				<li><a href="{{ path('buscar') }}">buscar libro</a></li>			
+        {% if is_granted('ROLE_USER') %}
+				<li><a href="{{ path('libros') }}">ver libros</a></li>
+        {% if is_granted('ROLE_ADMIN') %}
+        <li><a href="{{ path('nuevo') }}">nuevo libro</a></li>	
+        {% endif %}
+				<li><a href="{{ path('buscar') }}">buscar libro</a></li>		
+        {% endif %}	
 			</ul>
 		</nav> 
     {% endblock %}
@@ -23,8 +27,12 @@
     {% endblock %}
     
     {% block footer %}
-        <footer> 
-			- Desarrollo Web en Entorno Servidor 2019/2020 - 
+        <footer>
+        {% if is_granted('ROLE_USER') %}
+        Usuario logeado como {{ app.user.username }} <a href="{{ path('logout') }}">[Cerrar sesión]</a>
+        {% else %}
+			- Desarrollo Web en Entorno Servidor 2019/2020 
+      {% endif %}
 		</footer> 
     {% endblock %}
 
