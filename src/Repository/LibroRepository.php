@@ -26,6 +26,13 @@ class LibroRepository extends ServiceEntityRepository
         return $query->getResult();
 }
 
+public function tituloLibro($titulo): array {
+    $entityManager = $this->getEntityManager();
+    $query = $entityManager->createQuery('SELECT lib FROM App\Entity\Libro lib where lib.titulo LIKE :titulo');
+    $query->setParameter('titulo', '%'.$titulo.'%');
+    return $query->getResult();
+}
+
     // /**
     //  * @return Libro[] Returns an array of Libro objects
     //  */

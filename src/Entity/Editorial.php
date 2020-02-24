@@ -26,7 +26,7 @@ class Editorial
         return $this->id;
     }
 
-    public function getNombre(): ?string
+    public function getEditorial(): ?string
     {
         return $this->nombre;
     }

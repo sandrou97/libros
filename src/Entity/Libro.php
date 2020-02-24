@@ -3,16 +3,23 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\LibroRepository")
+ * @ORM\Entity
+ * @UniqueEntity("isbn")
  */
 class Libro
 {
 
     /**
      * @ORM\Id()
-     * @ORM\Column(type="string", length=20)
+     * @var string $isbn
+     * 
+     * @ORM\Column(name="isbn", type="string", length=20, unique=true)
+     * 
      */
     private $isbn;
 
@@ -28,6 +35,10 @@ class Libro
 
     /**
      * @ORM\Column(type="integer")
+     * @Assert\Range(
+     *      min = 100,
+     *      minMessage = "El número mínimo de páginas es {{ limit }}"
+     * )
      */
     private $paginas;
 

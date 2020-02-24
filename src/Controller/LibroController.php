@@ -8,6 +8,13 @@
     use App\Service\BDPruebaLibros;
     use App\Entity\Libro;
     use App\Entity\Editorial;
+    use Symfony\Component\Form\Extension\Core\Type\TextType; 
+    use Symfony\Component\Form\Extension\Core\Type\IntegerType; 
+    use Symfony\Component\Form\Extension\Core\Type\SubmitType; 
+    use Symfony\Component\Form\Extension\Core\Type\EntityTpe;
+    use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+    use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+    use Symfony\Component\HttpFoundation\Request;
     
     class LibroController extends AbstractController
     {
@@ -17,6 +24,13 @@
             $libros = $libro_rep->findAll();
             return $libros;
         }
+
+        public function pedir2(){
+            $libro_rep = $this->getDoctrine()->getRepository(Editorial::class); 
+            $libros = $libro_rep->findAll();
+            return $libros;
+        }
+
 
         /**
          * @Route("/libro/insertar", name="insertar")
@@ -39,6 +53,78 @@
             }
             $entityManager->flush();
             return $this->redirectToRoute('libros');
+        }
+
+        /**
+         * @Route("/nuevo", name="nuevo")
+         */
+        public function nuevo_libro(Request $request){
+            $libro = new Libro();
+            $formulario = $this->createFormBuilder($libro)
+                ->add('isbn', TextType::class)
+                ->add('titulo', TextType::class)
+                ->add('autor', TextType::class)
+                ->add('paginas', IntegerType::class)
+                ->add('editorial', EntityType::class, array(
+                    'class' => Editorial::class, 'choice_label' => 'editorial', ))
+                ->add('save', SubmitType::class, array('label' => 'Enviar')) ->getForm();
+
+                $formulario->handleRequest($request);
+
+                if ($formulario->isSubmitted() && $formulario->isValid())
+                {   
+                    $libro = $formulario->getData();
+                    $entityManager = $this->getDoctrine()->getManager();
+                    $entityManager->persist($libro); $entityManager->flush();
+                    return $this->redirectToRoute('libros');
+                }
+
+            return $this->render('nuevo_libro.html.twig', array('formulario' => $formulario->createView()));
+        }
+
+        /**
+         * @Route("/buscar", name="buscar")
+         */
+        public function buscar_libro(Request $request){
+            $cadena = NULL;
+            $libros = NULL;
+            if($request->server->get('REQUEST_METHOD')=='POST'){
+                $cadena = $request->request->get('cadena');
+                $repositorio = $this->getDoctrine()->getRepository(Libro::class);
+                $libros = $repositorio->tituloLibro($cadena);
+            }
+      
+           
+                
+            return $this->render('buscar_libro.html.twig', array('libros' => $libros));
+        }
+
+        /**
+         * @Route("/libro/editar/{isbn}", name="editar")
+         */
+        public function editar_libro(Request $request, $isbn){
+            $libro_rep = $this->getDoctrine()->getRepository(Libro::class); 
+            $libro = $libro_rep->find($isbn);
+            $formulario = $this->createFormBuilder($libro)
+                ->add('isbn', TextType::class)
+                ->add('titulo', TextType::class)
+                ->add('autor', TextType::class)
+                ->add('paginas', IntegerType::class)
+                ->add('editorial', EntityType::class, array(
+                    'class' => Editorial::class, 'choice_label' => 'editorial', ))
+                ->add('save', SubmitType::class, array('label' => 'Enviar')) ->getForm();
+
+                $formulario->handleRequest($request);
+
+                if ($formulario->isSubmitted() && $formulario->isValid())
+                {   
+                    $libro = $formulario->getData();
+                    $entityManager = $this->getDoctrine()->getManager();
+                    $entityManager->persist($libro); $entityManager->flush();
+                    return $this->redirectToRoute('libros');
+                }
+
+            return $this->render('editar_libro.html.twig', array('formulario' => $formulario->createView()));
         }
 
         /**
